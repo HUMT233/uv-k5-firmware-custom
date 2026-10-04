@@ -21,8 +21,8 @@ ENABLE_ROGER                := 1
 ENABLE_BIG_FREQ             := 1
 ENABLE_SMALL_BOLD           := 1
 
-# -------- 头文件搜索路径 (修复 No such file or directory 的关键) --------
-INC = -I. -I./driver -I./helper -I./ui -I./app -I./bsp
+# -------- 头文件搜索路径 (修复 ARMCM0.h 及硬件路径) --------
+INC = -I. -I./driver -I./helper -I./ui -I./app -I./bsp -I./external/CMSIS_5/CMSIS/Core/Include -I./bsp/dp32g030
 
 # -------- 编译参数 --------
 CFLAGS  = $(INC) -Os -Wall -Wextra -mcpu=cortex-m0 -mthumb -flto -ffunction-sections -fdata-sections
