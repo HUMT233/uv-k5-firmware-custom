@@ -1,0 +1,33 @@
+name: Build UV-K6 Custom Firmware
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch: # 支持在 GitHub 网页上点击一键运行
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Install Toolchain
+      run: |
+        sudo apt update
+        sudo apt install -y gcc-arm-none-eabi binutils-arm-none-eabi make python3
+
+    - name: Build Firmware
+      run: |
+        make clean
+        make -j$(nproc)
+
+    - name: Upload Output Firmware
+      uses: actions/upload-artifact@v4
+      with:
+        name: UV-K6-SI4732-ProFirmware
+        path: |
+          *.bin
