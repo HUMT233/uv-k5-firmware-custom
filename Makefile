@@ -6,7 +6,7 @@ CC             = $(CROSS_COMPILE)gcc
 OBJCOPY        = $(CROSS_COMPILE)objcopy
 SIZE           = $(CROSS_COMPILE)size
 
-# -------- 功能宏开关配置 (腾出空间给收音机) --------
+# -------- 功能宏开关配置 (腾出空间给收音机美化界面) --------
 ENABLE_AIRCOPY              := 0
 ENABLE_MDC1200              := 0
 ENABLE_SPECTRUM             := 0
@@ -21,8 +21,10 @@ ENABLE_ROGER                := 1
 ENABLE_BIG_FREQ             := 1
 ENABLE_SMALL_BOLD           := 1
 
-# -------- 头文件搜索路径 (修复 ARMCM0.h 及硬件路径) --------
-INC = -I. -I./driver -I./helper -I./ui -I./app -I./bsp -I./external/CMSIS_5/CMSIS/Core/Include -I./bsp/dp32g030
+# -------- 终极方案：自动扫描包含工程中的所有子目录 --------
+# 无论 ARMCM0.h、dp32g030 还是 helper 在哪个深度，通通自动加上 -I
+ALL_DIRS = $(shell find . -type d)
+INC      = $(patsubst %,-I%,$(ALL_DIRS))
 
 # -------- 编译参数 --------
 CFLAGS  = $(INC) -Os -Wall -Wextra -mcpu=cortex-m0 -mthumb -flto -ffunction-sections -fdata-sections
@@ -93,6 +95,7 @@ $(TARGET).elf: $(OBJS)
 $(TARGET).bin: $(TARGET).elf
 	$(OBJCOPY) -O binary $< $@
 
+# 打包成官方升级工具可识别的格式
 $(TARGET).packed.bin: $(TARGET).bin
 	-python3 ./version.py $< $@ || cp $< $@
 
