@@ -6,8 +6,7 @@ CC             = $(CROSS_COMPILE)gcc
 OBJCOPY        = $(CROSS_COMPILE)objcopy
 SIZE           = $(CROSS_COMPILE)size
 
-# -------- 功能宏开关配置 (针对 SI4732 定制与体积优化) --------
-# 1. 保留核心 UV 对讲，关闭无用耗空间模块
+# -------- 功能宏开关配置 (腾出空间给收音机) --------
 ENABLE_AIRCOPY              := 0
 ENABLE_MDC1200              := 0
 ENABLE_SPECTRUM             := 0
@@ -15,7 +14,6 @@ ENABLE_ALARM                := 0
 ENABLE_TX1750               := 0
 ENABLE_PWRON_PASSWORD       := 0
 
-# 2. 硬件与基本功能支持
 ENABLE_BATTERY_CHARGING     := 1
 ENABLE_FLASHLIGHT           := 1
 ENABLE_VOX                  := 1
@@ -23,8 +21,11 @@ ENABLE_ROGER                := 1
 ENABLE_BIG_FREQ             := 1
 ENABLE_SMALL_BOLD           := 1
 
-# -------- 编译与链接参数优化 (极致压缩体积) --------
-CFLAGS  = -Os -Wall -Wextra -mcpu=cortex-m0 -mthumb -flto -ffunction-sections -fdata-sections
+# -------- 头文件搜索路径 (修复 No such file or directory 的关键) --------
+INC = -I. -I./driver -I./helper -I./ui -I./app -I./bsp
+
+# -------- 编译参数 --------
+CFLAGS  = $(INC) -Os -Wall -Wextra -mcpu=cortex-m0 -mthumb -flto -ffunction-sections -fdata-sections
 CFLAGS += -DENABLE_AIRCOPY=$(ENABLE_AIRCOPY)
 CFLAGS += -DENABLE_MDC1200=$(ENABLE_MDC1200)
 CFLAGS += -DENABLE_SPECTRUM=$(ENABLE_SPECTRUM)
@@ -40,7 +41,7 @@ CFLAGS += -DENABLE_SMALL_BOLD=$(ENABLE_SMALL_BOLD)
 
 LDFLAGS = -mcpu=cortex-m0 -mthumb -flto -Wl,--gc-sections -specs=nano.specs -specs=nosys.specs -T project.ld
 
-# -------- 编译依赖源文件 --------
+# -------- 源码文件列表 --------
 SRCS = \
 	main.c \
 	app/action.c \
@@ -80,7 +81,6 @@ SRCS = \
 
 OBJS = $(SRCS:.c=.o)
 
-# -------- 构建规则 --------
 all: $(TARGET).bin $(TARGET).packed.bin
 
 %.o: %.c
@@ -93,7 +93,6 @@ $(TARGET).elf: $(OBJS)
 $(TARGET).bin: $(TARGET).elf
 	$(OBJCOPY) -O binary $< $@
 
-# 打包成官方升级工具可认的带版本头格式
 $(TARGET).packed.bin: $(TARGET).bin
 	-python3 ./version.py $< $@ || cp $< $@
 
