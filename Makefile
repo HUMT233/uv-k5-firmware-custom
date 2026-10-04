@@ -15,6 +15,11 @@ ENABLE_TX1750                 ?= 0
 ENABLE_PWRON_PASSWORD         ?= 0
 ENABLE_DTMF_CALLING           ?= 1
 ENABLE_FLASHLIGHT             ?= 1
+ENABLE_SI4732                 ?:= 1
+ENABLE_SI4732_SSB             ?:= 1
+ENABLE_AIRCOPY                ?:= 0
+ENABLE_MDC1200                ?:= 0
+ENABLE_SPECTRUM               ?:= 0
 
 # ---- CUSTOM MODS ----
 ENABLE_BIG_FREQ               ?= 1
